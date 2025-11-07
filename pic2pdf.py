@@ -115,5 +115,3 @@ if __name__ == "__main__":
     out_dir = Path().cwd()
     toPDF = Pic2PDF(base_dir=base_dir, out_dir=out_dir)
     toPDF.main(del_old=False)
-    # for p in Path("your path").iterdir():
-    #     Pic2PDF.adjust_size(Path(p), 2500, 96)
