@@ -3,33 +3,33 @@ from PIL import Image
 from dataclasses import dataclass
 
 
+def adjust_size(pic_path: Path, target_width: int, target_dpi: int) -> None:
+    """
+    调整图片的尺寸和dpi.
+    参数:
+    pic_path: 图片文件的路径.
+    target_width: 目标宽度.
+    target_dpi: 目标dpi(分辨率).
+    """
+    # 打开图片
+    im = Image.open(pic_path)
+    # 获取图片当前的宽度和高度
+    width, high = im.size
+    dpi = im.info.get("dpi")
+    if width == target_width and dpi == target_dpi:
+        return
+    # 调整图片尺寸, 保持长宽比, 并保存
+    im.resize(size=(target_width, int(target_width / width * high))).save(
+        pic_path, dpi=(target_dpi, target_dpi)
+    )
+
+
 @dataclass
 class Pic2PDF:
     base_dir: Path  # 待处理的图片所在目录
     out_dir: Path  # 转换后的PDF文件保存的位置，未指定则与图片在同一目录
     width: int | None = None  # 转换后图片的宽度
     dpi: int | None = None  # 转换后图片的dpi
-
-    @staticmethod
-    def adjust_size(pic_path: Path, target_width: int, target_dpi: int) -> None:
-        """
-        调整图片的尺寸和dpi.
-        参数:
-        pic_path: 图片文件的路径.
-        target_width: 目标宽度.
-        target_dpi: 目标dpi(分辨率).
-        """
-        # 打开图片
-        im = Image.open(pic_path)
-        # 获取图片当前的宽度和高度
-        width, high = im.size
-        dpi = im.info.get("dpi")
-        if width == target_width and dpi == target_dpi:
-            return
-        # 调整图片尺寸, 保持长宽比, 并保存
-        im.resize(size=(target_width, int(target_width / width * high))).save(
-            pic_path, dpi=(target_dpi, target_dpi)
-        )
 
     def get_size(self, img_dir: Path) -> tuple[int, int]:
         """
@@ -73,7 +73,7 @@ class Pic2PDF:
         file_list: list[Path] = []
         for file in img_dir.iterdir():
             if file.name.endswith((".jpg", "png")):
-                Pic2PDF.adjust_size(file, target_width, target_dpi)
+                adjust_size(file, target_width, target_dpi)
                 file_list.append(file)
         if len(file_list) == 0:
             print(f"{img_dir}: no images")
